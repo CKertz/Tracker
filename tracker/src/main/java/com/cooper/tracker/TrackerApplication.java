@@ -22,11 +22,10 @@ public class TrackerApplication extends JFrame {
 	}
 
 	private void initUI() {
-		ProjectFileChooser fileChooserHelper = new ProjectFileChooser();
-
+		ProjectFileChooser projectFileChooser = new ProjectFileChooser();
 		var quitButton = new JButton("Quit");
 		quitButton.addActionListener((ActionEvent event) -> {
-			fileChooserHelper.chooseFile(quitButton);
+			projectFileChooser.chooseFile(quitButton);
 
 			//System.exit(0);
 		});
@@ -35,8 +34,6 @@ public class TrackerApplication extends JFrame {
 		setSize(300,200);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-
 
 	}
 

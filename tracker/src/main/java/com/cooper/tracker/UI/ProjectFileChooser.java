@@ -3,24 +3,40 @@ package com.cooper.tracker.UI;
 import javax.swing.*;
 import java.io.*;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 public class ProjectFileChooser {
 
-    File configFile = new File("config.properties");
+    File configFile = new File("trackerconfig.properties");
+    String defaultPathpropertyName = "projectFileChooserDefaultPath";
     JFileChooser fileChooser = new JFileChooser();
+    static final Properties props = new Properties();
 
-    public void chooseFile(JComponent parent)
-    {
-        //TODO:implement pref directory, the props file formatting is scuffed
-        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+    public void chooseFile(JComponent parent) {
+        //first, check if default path exists
+        if (doesDefaultFileChooserLocationExist())
+        {
+            File file = new File(props.getProperty(defaultPathpropertyName));
+            String propsPath = file.getParent();
+
+            System.out.println(props.getProperty(propsPath));
+            fileChooser.setCurrentDirectory(new File(propsPath));
+
+        }
+        else
+        {
+            fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+        }
+
         int result = fileChooser.showOpenDialog(parent);
-        if(result ==JFileChooser.APPROVE_OPTION)
+
+        if(result == JFileChooser.APPROVE_OPTION)
         {
             File selectedFile = fileChooser.getSelectedFile();
 
-            setDefaultFileChooserLocation(configFile,selectedFile.toString().replace("\\","."));
-            //setDefaultFileChooserLocation(file,selectedFile.toString());
+            //setDefaultFileChooserLocation(configFile,selectedFile.toString().replace("\\","."));
+            setDefaultFileChooserLocation(configFile,selectedFile.toString());
             System.out.println("Selected file: " + selectedFile.getAbsolutePath());
 
         }
@@ -60,8 +76,7 @@ public class ProjectFileChooser {
     public void setDefaultFileChooserLocation(File file, String directory)
     {
         try{
-            Properties props = new Properties();
-            props.setProperty("projectFileChooserDefaultPath", directory);
+            props.setProperty(defaultPathpropertyName, directory);
             FileWriter writer = new FileWriter(configFile);
             props.store(writer,"filechooser settings");
             writer.close();
@@ -71,8 +86,21 @@ public class ProjectFileChooser {
             // I/O error
         }
     }
-    private String formatFilePathForFileChooser(String path)
+
+    public boolean doesDefaultFileChooserLocationExist()
     {
-        return path.replace("/",".");
+        try (InputStream input = new FileInputStream("D:\\CodeProjects\\Java\\TrackerApp\\tracker\\trackerconfig.properties"))
+        {
+            props.load(input);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        if(props.getProperty(defaultPathpropertyName) == null)
+            return false;
+        else
+            return true;
+
+
     }
 }
